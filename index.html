@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Asset Location Optimizer</title>
+<meta name="description" content="Place bonds in tax-deferred accounts and equities in taxable accounts for asset-location efficiency." />
+<!-- PWA / add-to-home-screen -->
+<meta name="theme-color" content="#0f1117" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Asset Location" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="icon-180.png" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app">
+  <header class="hero">
+    <h1>Asset Location Optimizer</h1>
+    <p class="tagline">
+      Place <strong>bonds in tax-deferred</strong> accounts and
+      <strong>equities in taxable</strong> accounts to minimize the tax drag on
+      your portfolio — without changing your overall stock/bond mix.
+    </p>
+  </header>
+
+  <main class="grid">
+    <!-- ====================== INPUTS ====================== -->
+    <section class="card" aria-labelledby="accounts-title">
+      <div class="card-head">
+        <h2 id="accounts-title">1 · Your Accounts</h2>
+        <button id="addAccount" class="btn btn-ghost" type="button">+ Add account</button>
+      </div>
+      <p class="hint">
+        Enter each account's balance. The <em>type</em> determines how its
+        earnings are taxed.
+      </p>
+      <div id="accountList" class="account-list"></div>
+
+      <div class="legend">
+        <span><span class="dot taxable"></span>Taxable — interest taxed yearly as ordinary income</span>
+        <span><span class="dot deferred"></span>Tax-deferred (401k / Trad IRA) — taxed on withdrawal</span>
+        <span><span class="dot free"></span>Tax-free (Roth / HSA) — never taxed again</span>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="targets-title">
+      <h2 id="targets-title">2 · Target Allocation &amp; Tax Profile</h2>
+      <div class="field-row">
+        <label for="bondPct">Target bonds</label>
+        <div class="slider-wrap">
+          <input type="range" id="bondPct" min="0" max="100" value="40" />
+          <output id="bondPctOut">40%</output>
+        </div>
+      </div>
+      <p class="hint">Equities take the rest (<span id="equityPctOut">60%</span>).</p>
+
+      <div class="rates">
+        <div class="rate">
+          <label for="ordRate">Marginal income tax rate</label>
+          <div class="pct-input"><input type="number" id="ordRate" min="0" max="60" value="32" /><span>%</span></div>
+          <small>Applied to bond interest in taxable accounts.</small>
+        </div>
+        <div class="rate">
+          <label for="qualRate">Qualified div / LTCG rate</label>
+          <div class="pct-input"><input type="number" id="qualRate" min="0" max="40" value="15" /><span>%</span></div>
+          <small>Applied to the taxable portion of equity returns.</small>
+        </div>
+      </div>
+
+      <details class="assumptions">
+        <summary>Return &amp; yield assumptions</summary>
+        <div class="rates">
+          <div class="rate">
+            <label for="bondYield">Bond yield</label>
+            <div class="pct-input"><input type="number" id="bondYield" min="0" max="20" step="0.1" value="4.5" /><span>%</span></div>
+          </div>
+          <div class="rate">
+            <label for="eqYield">Equity dividend yield</label>
+            <div class="pct-input"><input type="number" id="eqYield" min="0" max="10" step="0.1" value="1.8" /><span>%</span></div>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ====================== RESULTS ====================== -->
+    <section class="card result-card" aria-labelledby="plan-title">
+      <h2 id="plan-title">3 · Recommended Placement</h2>
+      <div id="warnings"></div>
+      <div id="plan" class="plan"></div>
+    </section>
+
+    <section class="card result-card" aria-labelledby="impact-title">
+      <h2 id="impact-title">Estimated Annual Tax Drag</h2>
+      <div id="impact" class="impact"></div>
+      <p class="disclaimer">
+        Educational estimate only — a single-year, steady-state approximation
+        that ignores state taxes, RMDs, basis step-up, muni bonds, and your
+        personal situation. Not tax advice.
+      </p>
+    </section>
+  </main>
+</div>
+
+<script src="optimizer.js"></script>
+<script src="app.js"></script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () =>
+      navigator.serviceWorker.register("sw.js").catch(() => {})
+    );
+  }
+</script>
+</body>
+</html>
