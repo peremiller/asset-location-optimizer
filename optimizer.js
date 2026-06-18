@@ -144,10 +144,30 @@ function estimateTaxDrag(placed, accounts, bondPct, rates) {
   return { optimized, naive, savings: naive - optimized };
 }
 
+/* ---------- Currency ---------- */
+// The app is built for a Philippine setting, so PHP is the default.
+const CURRENCIES = {
+  PHP: { code: "PHP", symbol: "₱", locale: "en-PH", label: "Philippine Peso" },
+  USD: { code: "USD", symbol: "$", locale: "en-US", label: "US Dollar" },
+  EUR: { code: "EUR", symbol: "€", locale: "de-DE", label: "Euro" },
+  SGD: { code: "SGD", symbol: "S$", locale: "en-SG", label: "Singapore Dollar" },
+  JPY: { code: "JPY", symbol: "¥", locale: "ja-JP", label: "Japanese Yen" },
+};
+
+let CURRENT_CURRENCY = "PHP";
+
+function setCurrency(code) {
+  if (CURRENCIES[code]) CURRENT_CURRENCY = code;
+}
+function currencySymbol() {
+  return CURRENCIES[CURRENT_CURRENCY].symbol;
+}
+
 function fmtMoney(n) {
-  return n.toLocaleString("en-US", {
+  const c = CURRENCIES[CURRENT_CURRENCY];
+  return n.toLocaleString(c.locale, {
     style: "currency",
-    currency: "USD",
+    currency: c.code,
     maximumFractionDigits: 0,
   });
 }
@@ -157,5 +177,11 @@ function fmtPct(n) {
 }
 
 if (typeof module !== "undefined") {
-  module.exports = { optimizeLocation, estimateTaxDrag, ACCOUNT_TYPES };
+  module.exports = {
+    optimizeLocation,
+    estimateTaxDrag,
+    ACCOUNT_TYPES,
+    CURRENCIES,
+    setCurrency,
+  };
 }

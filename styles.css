@@ -35,13 +35,34 @@ body {
   padding-top: max(32px, env(safe-area-inset-top));
 }
 
+.hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
 .hero h1 {
-  margin: 0 0 8px;
+  margin: 0;
   font-size: 2rem;
   letter-spacing: -0.02em;
 }
 .tagline { color: var(--muted); max-width: 70ch; margin: 0 0 8px; }
 .tagline strong { color: var(--text); }
+
+/* currency picker */
+.currency-picker { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+.currency-picker > span {
+  font-size: 0.68rem; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.currency-picker select {
+  background: var(--panel-2); color: var(--text);
+  border: 1px solid var(--border); border-radius: 9px;
+  padding: 8px 12px; font: inherit; font-size: 0.95rem; cursor: pointer;
+}
+.currency-picker select:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
 
 .grid {
   display: grid;
@@ -112,6 +133,21 @@ body {
 .pct-input input:focus { outline: none; }
 .pct-input span { color: var(--muted); font-size: 0.85rem; }
 .pct-input.money span { order: -1; }
+
+/* money field: currency-symbol prefix + a single clean control.
+   The inner input must stay borderless/transparent so it doesn't render a
+   nested box that crowds and clips the symbol. */
+.pct-input.money { padding-left: 14px; gap: 4px; }
+.pct-input.money .cur-sym {
+  order: -1; flex: 0 0 auto;
+  color: var(--muted); font-size: 0.95rem; font-weight: 600;
+}
+.account-row .pct-input.money input.acc-balance {
+  border: none; background: transparent; border-radius: 0;
+  padding: 10px 2px; min-width: 0;
+}
+.account-row .pct-input.money input.acc-balance:focus { outline: none; border: none; }
+.pct-input.money:focus-within { border-color: var(--accent); outline: 1px solid var(--accent); }
 
 .assumptions { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px; }
 .assumptions summary { cursor: pointer; color: var(--accent); font-size: 0.85rem; }

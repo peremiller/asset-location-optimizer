@@ -1,9 +1,9 @@
 /* UI wiring for the Asset Location Optimizer */
 
 let accounts = [
-  { id: 1, name: "Brokerage", type: "taxable", balance: 200000 },
-  { id: 2, name: "401(k)", type: "deferred", balance: 150000 },
-  { id: 3, name: "Roth IRA", type: "free", balance: 50000 },
+  { id: 1, name: "Regular brokerage", type: "taxable", balance: 2000000 },
+  { id: 2, name: "Company retirement", type: "deferred", balance: 1500000 },
+  { id: 3, name: "PERA", type: "free", balance: 500000 },
 ];
 let nextId = 4;
 
@@ -28,7 +28,7 @@ function renderAccounts() {
           .join("")}
       </select>
       <div class="pct-input money">
-        <span>$</span>
+        <span class="cur-sym">${currencySymbol()}</span>
         <input class="acc-balance" type="number" min="0" step="1000" value="${acc.balance}" aria-label="Balance" />
       </div>
       <button class="btn btn-remove" type="button" aria-label="Remove account">&times;</button>
@@ -169,6 +169,15 @@ el("addAccount").addEventListener("click", () => {
 ["bondPct", "ordRate", "qualRate", "bondYield", "eqYield"].forEach((id) =>
   el(id).addEventListener("input", recompute)
 );
+
+// Currency: update the symbol on every money field and re-render all amounts.
+el("currency").addEventListener("change", (e) => {
+  setCurrency(e.target.value);
+  document
+    .querySelectorAll(".cur-sym")
+    .forEach((s) => (s.textContent = currencySymbol()));
+  recompute();
+});
 
 /* ---------- init ---------- */
 renderAccounts();

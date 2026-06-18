@@ -19,11 +19,24 @@
 <body>
 <div class="app">
   <header class="hero">
-    <h1>Asset Location Optimizer</h1>
+    <div class="hero-top">
+      <h1>Asset Location Optimizer</h1>
+      <label class="currency-picker">
+        <span>Currency</span>
+        <select id="currency" aria-label="Currency">
+          <option value="PHP" selected>₱ PHP</option>
+          <option value="USD">$ USD</option>
+          <option value="EUR">€ EUR</option>
+          <option value="SGD">S$ SGD</option>
+          <option value="JPY">¥ JPY</option>
+        </select>
+      </label>
+    </div>
     <p class="tagline">
-      Place <strong>bonds in tax-deferred</strong> accounts and
-      <strong>equities in taxable</strong> accounts to minimize the tax drag on
-      your portfolio — without changing your overall stock/bond mix.
+      Keep your bonds inside <strong>tax-sheltered accounts (PERA, company
+      retirement)</strong> and your equities in your <strong>regular
+      brokerage</strong> — so the BIR's 20% final tax on interest stops eating
+      your returns, without changing your overall stock/bond mix.
     </p>
   </header>
 
@@ -41,9 +54,9 @@
       <div id="accountList" class="account-list"></div>
 
       <div class="legend">
-        <span><span class="dot taxable"></span>Taxable — interest taxed yearly as ordinary income</span>
-        <span><span class="dot deferred"></span>Tax-deferred (401k / Trad IRA) — taxed on withdrawal</span>
-        <span><span class="dot free"></span>Tax-free (Roth / HSA) — never taxed again</span>
+        <span><span class="dot taxable"></span>Taxable — regular brokerage / bank (COL, BPI Trade, GoTyme): 20% final tax on interest, 10% on dividends</span>
+        <span><span class="dot deferred"></span>Tax-deferred — company / SSS / RA&nbsp;4917 retirement fund: growth untaxed until payout</span>
+        <span><span class="dot free"></span>Tax-free — PERA: investment income is fully tax-exempt</span>
       </div>
     </section>
 
@@ -60,14 +73,14 @@
 
       <div class="rates">
         <div class="rate">
-          <label for="ordRate">Marginal income tax rate</label>
-          <div class="pct-input"><input type="number" id="ordRate" min="0" max="60" value="32" /><span>%</span></div>
-          <small>Applied to bond interest in taxable accounts.</small>
+          <label for="ordRate">Interest tax (final withholding)</label>
+          <div class="pct-input"><input type="number" id="ordRate" min="0" max="60" value="20" /><span>%</span></div>
+          <small>PH: 20% final tax on peso bond / deposit interest in a taxable account.</small>
         </div>
         <div class="rate">
-          <label for="qualRate">Qualified div / LTCG rate</label>
-          <div class="pct-input"><input type="number" id="qualRate" min="0" max="40" value="15" /><span>%</span></div>
-          <small>Applied to the taxable portion of equity returns.</small>
+          <label for="qualRate">Dividend tax (final)</label>
+          <div class="pct-input"><input type="number" id="qualRate" min="0" max="40" value="10" /><span>%</span></div>
+          <small>PH: 10% final tax on cash dividends from domestic companies.</small>
         </div>
       </div>
 
@@ -75,12 +88,12 @@
         <summary>Return &amp; yield assumptions</summary>
         <div class="rates">
           <div class="rate">
-            <label for="bondYield">Bond yield</label>
-            <div class="pct-input"><input type="number" id="bondYield" min="0" max="20" step="0.1" value="4.5" /><span>%</span></div>
+            <label for="bondYield">Bond / fixed-income yield</label>
+            <div class="pct-input"><input type="number" id="bondYield" min="0" max="20" step="0.1" value="6.0" /><span>%</span></div>
           </div>
           <div class="rate">
             <label for="eqYield">Equity dividend yield</label>
-            <div class="pct-input"><input type="number" id="eqYield" min="0" max="10" step="0.1" value="1.8" /><span>%</span></div>
+            <div class="pct-input"><input type="number" id="eqYield" min="0" max="10" step="0.1" value="2.0" /><span>%</span></div>
           </div>
         </div>
       </details>
@@ -98,8 +111,10 @@
       <div id="impact" class="impact"></div>
       <p class="disclaimer">
         Educational estimate only — a single-year, steady-state approximation
-        that ignores state taxes, RMDs, basis step-up, muni bonds, and your
-        personal situation. Not tax advice.
+        using PH final-withholding-tax rates. It ignores the 0.6% stock
+        transaction tax on listed-share sales, PERA contribution limits and the
+        5% tax credit, estate tax, and your personal situation. Not tax advice —
+        confirm with a PH tax professional or the BIR.
       </p>
     </section>
   </main>
