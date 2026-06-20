@@ -13,6 +13,8 @@
   --taxable: #6ea8fe;
   --deferred: #f0a35e;
   --free: #b78cf0;
+  --pera: #5ec88a;       /* PERA = tax-exempt shelter (green) */
+  --fund: #b78cf0;       /* Mutual Fund / UITF = shelter (violet) */
   --radius: 14px;
   font-synthesis: none;
 }
@@ -50,6 +52,13 @@ body {
 }
 .tagline { color: var(--muted); max-width: 70ch; margin: 0 0 8px; }
 .tagline strong { color: var(--text); }
+.ph-badge {
+  display: inline-block; vertical-align: middle;
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.02em;
+  color: var(--text); background: var(--panel-2);
+  border: 1px solid var(--border); border-radius: 999px;
+  padding: 3px 10px; margin-left: 8px; white-space: nowrap;
+}
 
 /* currency picker */
 .currency-picker { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
@@ -114,6 +123,8 @@ body {
 .dot.taxable { background: var(--taxable); }
 .dot.deferred { background: var(--deferred); }
 .dot.free { background: var(--free); }
+.dot.pera { background: var(--pera); }
+.dot.fund { background: var(--fund); }
 
 .legend { display: flex; flex-direction: column; gap: 4px; margin-top: 14px; color: var(--muted); font-size: 0.8rem; }
 .legend span { display: flex; align-items: center; gap: 8px; }

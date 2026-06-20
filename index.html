@@ -20,7 +20,7 @@
 <div class="app">
   <header class="hero">
     <div class="hero-top">
-      <h1>Asset Location Optimizer</h1>
+      <h1>Asset Location Optimizer <span class="ph-badge">🇵🇭 PH edition</span></h1>
       <label class="currency-picker">
         <span>Currency</span>
         <select id="currency" aria-label="Currency">
@@ -33,10 +33,12 @@
       </label>
     </div>
     <p class="tagline">
-      Keep your bonds inside <strong>tax-sheltered accounts (PERA, company
-      retirement)</strong> and your equities in your <strong>regular
-      brokerage</strong> — so the BIR's 20% final tax on interest stops eating
-      your returns, without changing your overall stock/bond mix.
+      In the Philippines, <strong>PSE stocks are barely taxed</strong> (no
+      capital gains tax — just 0.6% when you sell), but <strong>interest gets a
+      flat 20% final tax</strong>. So shelter your bonds inside
+      <strong>PERA and mutual funds / UITFs</strong>, hold your stocks
+      directly, and stop handing the BIR 20% of your interest — all without
+      changing your overall stock/bond mix.
     </p>
   </header>
 
@@ -54,9 +56,9 @@
       <div id="accountList" class="account-list"></div>
 
       <div class="legend">
-        <span><span class="dot taxable"></span>Taxable — regular brokerage / bank (COL, BPI Trade, GoTyme): 20% final tax on interest, 10% on dividends</span>
-        <span><span class="dot deferred"></span>Tax-deferred — company / SSS / RA&nbsp;4917 retirement fund: growth untaxed until payout</span>
-        <span><span class="dot free"></span>Tax-free — PERA: investment income is fully tax-exempt</span>
+        <span><span class="dot pera"></span>PERA — investment income fully tax-exempt; best bond shelter (₱100k/yr contribution cap, ₱200k for OFWs)</span>
+        <span><span class="dot fund"></span>Mutual Fund / UITF — gains tax-exempt on redemption; a flexible shelter with no cap</span>
+        <span><span class="dot taxable"></span>Bank / Direct (taxable) — deposits, RTBs, direct PSE stocks: 20% final tax on interest, 10% on dividends, 0% on listed-share gains</span>
       </div>
     </section>
 

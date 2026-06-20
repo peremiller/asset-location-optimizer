@@ -1,31 +1,40 @@
 /*
- * Asset Location Optimizer — core logic
+ * Asset Location Optimizer — Philippine edition — core logic
  *
- * Principle: your overall stock/bond ratio is fixed by your risk tolerance.
- * Asset *location* decides WHICH account each dollar of stocks vs bonds lives
- * in. Because bond interest is taxed every year as ordinary income while
- * equities enjoy deferral, favorable qualified-dividend/LTCG rates, and a
- * basis step-up, the tax-efficient default is:
+ * Your overall stock/bond ratio is fixed by your risk tolerance. Asset
+ * *location* decides WHICH wrapper each peso of stocks vs bonds sits in.
  *
- *   1. Fill TAX-DEFERRED accounts with bonds first (shelter ordinary income).
- *   2. Overflow bonds into TAX-FREE (Roth), then TAXABLE (ideally munis).
- *   3. Put equities in TAXABLE and TAX-FREE accounts.
- *   4. Any leftover tax-deferred space gets equities.
+ * Philippine tax reality (individual investor):
+ *   • Interest on peso deposits / bonds  → 20% FINAL withholding tax (heavy).
+ *   • Cash dividends from PH companies    → 10% final tax.
+ *   • Gains on PSE-listed shares          → NO capital gains tax; only a 0.6%
+ *                                           stock-transaction tax when you sell.
+ *   • PERA, mutual funds & UITFs          → investment income is tax-EXEMPT.
  *
- * The result keeps the SAME total bond % but concentrates bonds where their
- * interest is sheltered.
+ * So in the PH the costly asset is FIXED INCOME (that 20% interest tax), while
+ * stocks are already tax-light. The efficient default is therefore:
+ *
+ *   1. Fill your TAX-EXEMPT shelters (PERA, then mutual funds / UITFs) with
+ *      BONDS first — that's where the 20% interest tax is killed.
+ *   2. Overflow bonds into the TAXABLE bucket (bank / direct bonds) only if the
+ *      shelters run out — and prefer a 5-year+ time deposit there (exempt).
+ *   3. Hold EQUITIES in the taxable bucket (direct PSE stocks barely get taxed),
+ *      preserving scarce shelter space for bonds.
+ *
+ * Same total bond %, but bonds end up where their interest isn't taxed.
  */
 
 const ACCOUNT_TYPES = {
-  taxable: { label: "Taxable", className: "taxable" },
-  deferred: { label: "Tax-deferred", className: "deferred" },
-  free: { label: "Tax-free", className: "free" },
+  pera: { label: "PERA (tax-exempt)", className: "pera" },
+  fund: { label: "Mutual Fund / UITF", className: "fund" },
+  taxable: { label: "Bank / Direct (taxable)", className: "taxable" },
 };
 
-// Placement priority for bonds: tax-deferred → tax-free → taxable.
-const BOND_PRIORITY = ["deferred", "free", "taxable"];
-// Equities take whatever bonds don't: taxable → tax-free → tax-deferred.
-const EQUITY_PRIORITY = ["taxable", "free", "deferred"];
+// Bonds go to the best shelter first: PERA → Mutual Fund/UITF → taxable.
+const BOND_PRIORITY = ["pera", "fund", "taxable"];
+// Equities take whatever's left, staying in the lightly-taxed taxable bucket
+// so the tax-exempt shelters are reserved for bonds.
+const EQUITY_PRIORITY = ["taxable", "fund", "pera"];
 
 /**
  * Compute the optimal asset location.
@@ -87,23 +96,25 @@ function optimizeLocation(accounts, bondPct) {
   }
 
   // --- Diagnostics ---
-  const deferredSpace = placed
-    .filter((p) => p.type === "deferred")
+  // Shelter space = everything that isn't the plain taxable bucket
+  // (PERA + Mutual Funds / UITFs all make investment income tax-exempt).
+  const shelterSpace = placed
+    .filter((p) => p.type !== "taxable")
     .reduce((s, p) => s + p.balance, 0);
-  if (result.bondTarget > deferredSpace + 1e-6) {
-    const overflow = result.bondTarget - deferredSpace;
-    const hasFree = placed.some((p) => p.type === "free");
+  if (result.bondTarget > shelterSpace + 1e-6) {
+    const overflow = result.bondTarget - shelterSpace;
     result.warnings.push(
-      `Your bond target (${fmtMoney(result.bondTarget)}) exceeds your ` +
-        `tax-deferred space (${fmtMoney(deferredSpace)}). ${fmtMoney(overflow)} ` +
-        `of bonds had to spill into ${hasFree ? "Roth, then " : ""}taxable — ` +
-        `consider tax-exempt municipal bonds for the taxable portion.`
+      `Your bond target (${fmtMoney(result.bondTarget)}) is bigger than your ` +
+        `tax-exempt shelter space (${fmtMoney(shelterSpace)} in PERA + funds). ` +
+        `${fmtMoney(overflow)} of bonds had to stay in the taxable bucket, where ` +
+        `interest is hit with the 20% final tax — park that slice in a 5-year+ ` +
+        `time deposit or a bond UITF, whose interest is tax-exempt.`
     );
   }
-  if (deferredSpace > result.bondTarget + 1e-6 && result.equityTarget > 0) {
+  if (shelterSpace > result.bondTarget + 1e-6 && result.equityTarget > 0) {
     result.warnings.push(
-      `You have more tax-deferred space than bonds, so the surplus holds ` +
-        `equities. That's fine — bonds are fully sheltered.`
+      `You have more tax-exempt shelter than you have bonds, so the surplus ` +
+        `holds equities. That's fine — your fixed income is fully sheltered.`
     );
   }
 

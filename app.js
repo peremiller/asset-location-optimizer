@@ -1,9 +1,9 @@
 /* UI wiring for the Asset Location Optimizer */
 
 let accounts = [
-  { id: 1, name: "Regular brokerage", type: "taxable", balance: 2000000 },
-  { id: 2, name: "Company retirement", type: "deferred", balance: 1500000 },
-  { id: 3, name: "PERA", type: "free", balance: 500000 },
+  { id: 1, name: "BPI / BDO + PSE stocks", type: "taxable", balance: 2000000 },
+  { id: 2, name: "Equity / Bond UITF", type: "fund", balance: 1500000 },
+  { id: 3, name: "PERA", type: "pera", balance: 500000 },
 ];
 let nextId = 4;
 
