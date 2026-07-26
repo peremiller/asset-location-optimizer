@@ -1,4 +1,8 @@
 .tmp/
 .claude/
 .DS_Store
-.vercel
+.vercel/
+node_modules/
+dist/
+.npm-cache/
+*.log

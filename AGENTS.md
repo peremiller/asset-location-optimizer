@@ -10,3 +10,9 @@
 - Do not bundle AirLLM into browser JavaScript, static sites, mobile clients, or Vercel/edge-only functions. Put inference behind a provider-neutral Python service and keep model caches, tokens, and layer shards out of source control.
 - If the task does not involve LLM inference, do not add AirLLM as a dependency; preserve this rule for future AI features.
 <!-- END: graphify-airllm -->
+
+## Selected product direction
+
+- Combine the premium light styling of concept 1, the analytical precision of concept 2, and the guided placement map of concept 3.
+- Keep “Asset Location Optimizer” as the product name, retain the PH edition context, and make estimated annual savings the primary visual outcome.
+- Preserve the editable account list, allocation and Philippine tax controls, placement recommendation, and naïve-versus-optimized tax comparison across desktop and mobile.
