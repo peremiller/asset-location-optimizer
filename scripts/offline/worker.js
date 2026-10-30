@@ -75,7 +75,11 @@ function selected(request){
  if(!['GET','HEAD'].includes(request.method)||url.origin!==ORIGIN||request.headers.has('authorization')||url.pathname.startsWith(CONFIG.base+'api/'))return null;
  if(request.mode==='navigate'){
   if(CONFIG.routes[url.pathname])return CONFIG.routes[url.pathname];
-  if(CONFIG.spa&&url.pathname.startsWith(CONFIG.base)&&!url.pathname.split('/').at(-1).includes('.'))return {path:CONFIG.base+'index.html'};
+  // Unknown account and private routes must reach their own server handlers.
+  // Explicitly published public HTML routes were already resolved above.
+  let decoded;try{decoded=decodeURIComponent(url.pathname);}catch{return null;}
+  const sensitive=decoded.split('/').some(part=>/^(?:api|private|uploads|user-data|auth|account)$/i.test(part));
+  if(CONFIG.spa&&!sensitive&&url.pathname.startsWith(CONFIG.base)&&!url.pathname.split('/').at(-1).includes('.'))return {path:CONFIG.base+'index.html'};
  }
  return files.has(url.pathname)?{path:url.pathname}:null;
 }

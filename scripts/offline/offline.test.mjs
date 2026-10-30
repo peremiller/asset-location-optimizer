@@ -94,6 +94,7 @@ test('The generator is idempotent, narrows CSP changes to first-party capabiliti
 test('An explicitly verified SPA fallback remains inside its public scope',async()=>{
  const {root}=await fixture({spa:true,base:'/tools/'});const w=await harness(root);await w.event('install');w.setOffline();
  assert.match(await(await w.fetch('/tools/deep/never-visited')).text(),/Public app/);assert.equal(await w.fetch('/outside'),undefined);assert.equal(await w.fetch('/tools/api/private'),undefined);
+ for(const pathname of ['/tools/private/records','/tools/account/session','/tools/auth/refresh','/tools/uploads/mine','/tools/user-data/export','/tools/%70rivate/records','/tools/x%2Fprivate%2Frecords','/tools/%ZZ'])assert.equal(await w.fetch(pathname),undefined);
 });
 test('Public archives cannot bypass explicit private or no-store response policies, and inherited CSP capabilities survive',async()=>{
  const {root}=await fixture();
