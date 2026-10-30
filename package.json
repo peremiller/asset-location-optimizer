@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "vite build && node scripts/offline/build.mjs --dir dist --name \"Asset Location Optimizer\" --spa --limits \"Account and tax placement calculations run locally.\"",
+    "preview": "vite preview",
+    "test:offline": "node --test scripts/offline/offline.test.mjs scripts/offline/client.test.mjs"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",
