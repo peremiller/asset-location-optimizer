@@ -98,7 +98,7 @@ function calculateTaxDrag(accounts, allocations, targetBondPercent, rates) {
 
 function Step({ number, label, active, onClick }) {
   return (
-    <button className={`step ${active ? "is-active" : ""}`} type="button" onClick={onClick}>
+    <button className={`step ${active ? "is-active" : ""}`} type="button" aria-current={active ? "step" : undefined} onClick={onClick}>
       <span className="step-number">{number}</span>
       <span>{label}</span>
     </button>
@@ -267,17 +267,18 @@ export function App() {
 
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#main-content">Skip to main content</a>
       <header className="topbar">
         <div className="brand-lockup">
           <h1>Asset Location Optimizer</h1>
           <span className="edition-badge"><img src={phFlag} alt="" aria-hidden="true" /> PH edition</span>
         </div>
         <nav className="progress-nav" aria-label="Optimizer steps">
-          <Step number="1" label="Accounts" active={!isOptimized} onClick={() => scrollTo(accountsRef)} />
+          <Step number="1" label="Accounts" active={!isOptimized && !isCalculating} onClick={() => scrollTo(accountsRef)} />
           <span className="step-line" aria-hidden="true" />
           <Step number="2" label="Optimize" active={isCalculating} onClick={() => scrollTo(controlsRef)} />
           <span className="step-line" aria-hidden="true" />
-          <Step number="3" label="Review" active={isOptimized} onClick={() => scrollTo(workspaceRef)} />
+          <Step number="3" label="Review" active={isOptimized && !isCalculating} onClick={() => scrollTo(workspaceRef)} />
         </nav>
         <label className="currency-control">
           <span>Currency</span>
@@ -287,7 +288,7 @@ export function App() {
         </label>
       </header>
 
-      <main className="app-grid">
+      <main className="app-grid" id="main-content" tabIndex={-1}>
         <aside className="accounts-panel" ref={accountsRef}>
           <div className="section-heading-row">
             <div><span className="eyebrow">1. Your accounts</span><p>Enter each balance. The account type determines how its earnings are taxed.</p></div>
