@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowCounterClockwise,
   ArrowRight,
@@ -51,6 +51,13 @@ const CURRENCIES = {
 };
 
 const BOND_PRIORITY = { pera: 0, fund: 1, taxable: 2 };
+const STEP_IDS = ["accounts", "optimize", "review"];
+
+function stepFromLocation() {
+  if (typeof window === "undefined") return "accounts";
+  const hash = window.location.hash.slice(1);
+  return STEP_IDS.includes(hash) ? hash : "accounts";
+}
 
 function formatMoney(value, currency) {
   const { symbol, locale } = CURRENCIES[currency];
@@ -96,12 +103,12 @@ function calculateTaxDrag(accounts, allocations, targetBondPercent, rates) {
   return { naive, optimized, saved: Math.max(0, naive - optimized) };
 }
 
-function Step({ number, label, active, onClick }) {
+function Step({ id, number, label, active, onClick }) {
   return (
-    <button className={`step ${active ? "is-active" : ""}`} type="button" aria-current={active ? "step" : undefined} onClick={onClick}>
+    <a className={`step ${active ? "is-active" : ""}`} href={`#${id}`} aria-current={active ? "location" : undefined} onClick={onClick}>
       <span className="step-number">{number}</span>
       <span>{label}</span>
-    </button>
+    </a>
   );
 }
 
@@ -214,9 +221,16 @@ export function App() {
   const [assumptionsOpen, setAssumptionsOpen] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
   const [isOptimized, setIsOptimized] = useState(false);
+  const [currentStep, setCurrentStep] = useState(stepFromLocation);
   const accountsRef = useRef(null);
   const workspaceRef = useRef(null);
   const controlsRef = useRef(null);
+
+  useEffect(() => {
+    const syncStep = () => setCurrentStep(stepFromLocation());
+    window.addEventListener("hashchange", syncStep);
+    return () => window.removeEventListener("hashchange", syncStep);
+  }, []);
 
   const { total, result: allocations } = useMemo(() => optimizeAccounts(accounts, targetBonds), [accounts, targetBonds]);
   const bondsTotal = total * (targetBonds / 100);
@@ -259,11 +273,11 @@ export function App() {
     window.setTimeout(() => {
       setIsCalculating(false);
       setIsOptimized(true);
+      setCurrentStep("review");
+      window.location.hash = "review";
       workspaceRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 650);
   }
-
-  const scrollTo = (ref) => ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   return (
     <div className="app-shell">
@@ -274,11 +288,11 @@ export function App() {
           <span className="edition-badge"><img src={phFlag} alt="" aria-hidden="true" /> PH edition</span>
         </div>
         <nav className="progress-nav" aria-label="Optimizer steps">
-          <Step number="1" label="Accounts" active={!isOptimized && !isCalculating} onClick={() => scrollTo(accountsRef)} />
+          <Step id="accounts" number="1" label="Accounts" active={currentStep === "accounts"} onClick={() => setCurrentStep("accounts")} />
           <span className="step-line" aria-hidden="true" />
-          <Step number="2" label="Optimize" active={isCalculating} onClick={() => scrollTo(controlsRef)} />
+          <Step id="optimize" number="2" label="Optimize" active={currentStep === "optimize"} onClick={() => setCurrentStep("optimize")} />
           <span className="step-line" aria-hidden="true" />
-          <Step number="3" label="Review" active={isOptimized && !isCalculating} onClick={() => scrollTo(workspaceRef)} />
+          <Step id="review" number="3" label="Review" active={currentStep === "review"} onClick={() => setCurrentStep("review")} />
         </nav>
         <label className="currency-control">
           <span>Currency</span>
@@ -289,7 +303,7 @@ export function App() {
       </header>
 
       <main className="app-grid" id="main-content" tabIndex={-1}>
-        <aside className="accounts-panel" ref={accountsRef}>
+        <aside className="accounts-panel" id="accounts" ref={accountsRef}>
           <div className="section-heading-row">
             <div><span className="eyebrow">1. Your accounts</span><p>Enter each balance. The account type determines how its earnings are taxed.</p></div>
             <Info size={18} aria-label="Account guidance" />
@@ -310,7 +324,7 @@ export function App() {
           </div>
         </aside>
 
-        <section className="workspace" ref={workspaceRef}>
+        <section className="workspace" id="review" ref={workspaceRef}>
           <div className="outcome-hero">
             <h2>You could save an estimated <strong>{formatMoney(taxDrag.saved, currency)}</strong> per year</h2>
             <p>Place bonds in tax-sheltered accounts and equities where they are most efficient—without changing your overall risk.</p>
@@ -352,7 +366,7 @@ export function App() {
           <p className="disclaimer"><Info size={16} aria-hidden="true" /><span><strong>Educational estimate only.</strong> A single-year, steady-state approximation using PH final-withholding-tax rates. It excludes the 0.6% stock transaction tax, PERA contribution limits and tax credit, estate tax, fees, and your personal circumstances. Not tax advice—confirm with a Philippine tax professional or the BIR.</span></p>
         </section>
 
-        <aside className="controls-panel" ref={controlsRef}>
+        <aside className="controls-panel" id="optimize" ref={controlsRef}>
           <div className="section-heading-row"><span className="eyebrow">2. Target allocation</span><Info size={18} aria-label="Allocation guidance" /></div>
           <div className="range-group">
             <div className="label-row"><label htmlFor="target-bonds">Target bonds</label><strong>{targetBonds}%</strong></div>
