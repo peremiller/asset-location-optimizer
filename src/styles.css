@@ -98,6 +98,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   padding: 0;
   font-size: 0.7rem;
   font-weight: 500;
+  text-decoration: none;
 }
 .step:hover, .step.is-active { color: var(--brand-dark); }
 .step-number {
@@ -146,6 +147,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   padding: 25px 24px 28px;
   background: #fbfcfe;
 }
+#accounts, #review, #optimize { scroll-margin-top: 92px; }
 .accounts-panel { grid-area: accounts; border-right: 1px solid var(--line); }
 .controls-panel { grid-area: controls; border-left: 1px solid var(--line); }
 .workspace { grid-area: workspace; min-width: 0; padding: 24px 22px 28px; background: #fff; }
