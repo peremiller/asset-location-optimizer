@@ -1,0 +1,42 @@
+name: Asset Location Optimizer browser quality
+on:
+  push:
+    paths:
+      - "src/**"
+      - "tests/navigation.test.cjs"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/asset-location-quality.yml"
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build-and-chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install locked project dependencies
+        run: npm ci
+      - name: Build original production bundle and offline assets
+        run: npm run build
+      - name: Test existing offline suite
+        run: npm run test:offline
+      - name: Install ephemeral browser test driver
+        run: |
+          npm install --no-save --package-lock=false playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Test real Chromium keyboard, hash routes and responsive states
+        run: |
+          npm run dev -- --host 127.0.0.1 --port 4173 > /tmp/asset-location-vite.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/ > /dev/null; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:4173/ > /dev/null
+          node --test tests/navigation.test.cjs
