@@ -42,6 +42,10 @@ test("native hash navigation, keyboard focus, interactions and responsive layout
         await page.waitForURL("**/#review");
         assert.equal(await review.getAttribute("aria-current"), "location");
         assert.match(await page.locator(".success-banner").innerText(), /Placement updated/);
+        assert.equal(await page.locator(".success-banner").getAttribute("role"), "status");
+        assert.equal(await page.locator("#review").getAttribute("aria-labelledby"), "review-heading");
+        assert.equal(await page.locator("#review").evaluate(el => document.activeElement === el), true,
+          "Keyboard focus should move to the labelled review results after optimization");
         await page.getByRole("button", { name: "Reset inputs" }).click();
         assert.equal(await page.locator(".account-editor").count(), 3);
 
