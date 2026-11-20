@@ -275,7 +275,11 @@ export function App() {
       setIsOptimized(true);
       setCurrentStep("review");
       window.location.hash = "review";
-      workspaceRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      workspaceRef.current?.focus({ preventScroll: true });
+      workspaceRef.current?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+        block: "start",
+      });
     }, 650);
   }
 
@@ -324,9 +328,9 @@ export function App() {
           </div>
         </aside>
 
-        <section className="workspace" id="review" ref={workspaceRef}>
+        <section className="workspace" id="review" ref={workspaceRef} tabIndex={-1} aria-labelledby="review-heading">
           <div className="outcome-hero">
-            <h2>You could save an estimated <strong>{formatMoney(taxDrag.saved, currency)}</strong> per year</h2>
+            <h2 id="review-heading">You could save an estimated <strong>{formatMoney(taxDrag.saved, currency)}</strong> per year</h2>
             <p>Place bonds in tax-sheltered accounts and equities where they are most efficient—without changing your overall risk.</p>
           </div>
           {isOptimized && <div className="success-banner" role="status"><CheckCircle size={20} weight="fill" /> Placement updated using your latest balances and tax assumptions.</div>}
