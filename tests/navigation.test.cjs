@@ -42,6 +42,25 @@ test("native hash navigation, keyboard focus, interactions and responsive layout
         await page.waitForURL("**/#review");
         assert.equal(await review.getAttribute("aria-current"), "location");
         assert.match(await page.locator(".success-banner").innerText(), /Placement updated/);
+        assert.equal(await page.locator(".success-banner").getAttribute("role"), "status");
+        assert.equal(await page.locator("#review").getAttribute("aria-labelledby"), "review-heading");
+        assert.equal(await page.locator("#review").evaluate(el => document.activeElement === el), true,
+          "Keyboard focus should move to the labelled review results after optimization");
+        // A changed tax assumption must not leave a stale "Placement updated" notice.
+        // HTML min/max attributes are hints only; React must bound the actual model.
+        const taxInputs = page.locator('.percent-control input[type="number"]');
+        await taxInputs.nth(0).fill("125");
+        assert.equal(await taxInputs.nth(0).inputValue(), "60");
+        assert.equal(await page.locator(".success-banner").count(), 0);
+        await taxInputs.nth(1).fill("-12");
+        assert.equal(await taxInputs.nth(1).inputValue(), "0");
+        await page.getByRole("button", { name: /Return.*yield assumptions/ }).click();
+        const yields = page.locator('.assumptions-panel input[type="number"]');
+        await yields.nth(0).fill("99");
+        await yields.nth(1).fill("-3");
+        assert.deepEqual(await yields.evaluateAll(elements => elements.map(el => el.value)), ["20", "0"]);
+        assert.equal(await page.locator(".account-editor").count(), 4,
+          "Changing assumptions must not discard accounts or balances");
         await page.getByRole("button", { name: "Reset inputs" }).click();
         assert.equal(await page.locator(".account-editor").count(), 3);
 
