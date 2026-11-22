@@ -36,8 +36,16 @@ test("native hash navigation, keyboard focus, interactions and responsive layout
         assert.equal(await optimize.evaluate(el => document.activeElement === el), true);
         const outline = await optimize.evaluate(el => getComputedStyle(el).outlineStyle);
         assert.notEqual(outline, "none");
+        // Two additions at the same clock tick must remain independently editable.
+        // Legacy Date.now() IDs could collide and deleting one removed both.
+        await page.evaluate(() => { Date.now = () => 1700000000000; });
         await page.getByRole("button", { name: "Add account" }).click();
-        assert.equal(await page.locator(".account-editor").count(), 4);
+        await page.getByRole("button", { name: "Add account" }).click();
+        assert.equal(await page.locator(".account-editor").count(), 5);
+        await page.getByRole("button", { name: "Remove New account" }).first().click();
+        assert.equal(await page.locator(".account-editor").count(), 4,
+          "Removing one new account must preserve the other despite identical clock ticks");
+        assert.equal(await page.getByRole("button", { name: "Remove New account" }).count(), 1);
         await page.getByRole("button", { name: "Optimize placement" }).click();
         await page.waitForURL("**/#review");
         assert.equal(await review.getAttribute("aria-current"), "location");
