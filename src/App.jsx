@@ -255,7 +255,12 @@ export function App() {
   }
 
   function addAccount() {
-    setAccounts((current) => [...current, { id: Date.now(), name: "New account", type: "taxable", balance: 0 }]);
+    // Generate an ID from current state so rapid clicks in the same millisecond
+    // cannot produce duplicate React keys or remove more than one account.
+    setAccounts((current) => {
+      const nextId = Math.max(Date.now(), ...current.map((account) => Number(account.id) || 0)) + 1;
+      return [...current, { id: nextId, name: "New account", type: "taxable", balance: 0 }];
+    });
     setIsOptimized(false);
   }
 
