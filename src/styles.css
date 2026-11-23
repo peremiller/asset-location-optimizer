@@ -243,6 +243,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible
   font-weight: 600;
 }
 .money-input input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font-weight: 600; }
+/* The input removes its own ring; give the enclosing label a visible keyboard focus indicator. */
+.money-input:focus-within { outline: 3px solid var(--brand-dark); outline-offset: 3px; }
 .account-notes { display: grid; gap: 10px; margin-top: 18px; }
 .note-row { display: grid; grid-template-columns: 8px 1fr; gap: 7px; align-items: start; }
 .note-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; }

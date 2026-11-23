@@ -240,13 +240,27 @@ export function App() {
     [accounts, allocations, targetBonds, interestTax, dividendTax, bondYield, equityYield],
   );
 
+  // Percentage constraints are enforced in state, not just by HTML input hints.
+  // Changing assumptions invalidates the previous successful-run notice.
+  function updatePercent(setter, raw, maximum) {
+    const parsed = Number(raw);
+    if (!Number.isFinite(parsed)) return;
+    setter(Math.max(0, Math.min(maximum, parsed)));
+    setIsOptimized(false);
+  }
+
   function updateAccount(id, field, value) {
     setAccounts((current) => current.map((account) => (account.id === id ? { ...account, [field]: value } : account)));
     setIsOptimized(false);
   }
 
   function addAccount() {
-    setAccounts((current) => [...current, { id: Date.now(), name: "New account", type: "taxable", balance: 0 }]);
+    // Generate an ID from current state so rapid clicks in the same millisecond
+    // cannot produce duplicate React keys or remove more than one account.
+    setAccounts((current) => {
+      const nextId = Math.max(Date.now(), ...current.map((account) => Number(account.id) || 0)) + 1;
+      return [...current, { id: nextId, name: "New account", type: "taxable", balance: 0 }];
+    });
     setIsOptimized(false);
   }
 
@@ -275,7 +289,11 @@ export function App() {
       setIsOptimized(true);
       setCurrentStep("review");
       window.location.hash = "review";
-      workspaceRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      workspaceRef.current?.focus({ preventScroll: true });
+      workspaceRef.current?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+        block: "start",
+      });
     }, 650);
   }
 
@@ -324,9 +342,9 @@ export function App() {
           </div>
         </aside>
 
-        <section className="workspace" id="review" ref={workspaceRef}>
+        <section className="workspace" id="review" ref={workspaceRef} tabIndex={-1} aria-labelledby="review-heading">
           <div className="outcome-hero">
-            <h2>You could save an estimated <strong>{formatMoney(taxDrag.saved, currency)}</strong> per year</h2>
+            <h2 id="review-heading">You could save an estimated <strong>{formatMoney(taxDrag.saved, currency)}</strong> per year</h2>
             <p>Place bonds in tax-sheltered accounts and equities where they are most efficient—without changing your overall risk.</p>
           </div>
           {isOptimized && <div className="success-banner" role="status"><CheckCircle size={20} weight="fill" /> Placement updated using your latest balances and tax assumptions.</div>}
@@ -376,13 +394,13 @@ export function App() {
           </div>
           <div className="control-divider" />
           <div className="section-heading-row tax-heading"><span className="eyebrow">Tax profile (PH)</span><Info size={18} aria-label="Philippine tax profile guidance" /></div>
-          <label className="percent-control"><span>Interest tax (final withholding)</span><div><input type="number" min="0" max="60" value={interestTax} onChange={(event) => setInterestTax(Number(event.target.value))} /><b>%</b></div><small>20% final tax on peso bond and deposit interest in a taxable account.</small></label>
-          <label className="percent-control"><span>Dividend tax (final)</span><div><input type="number" min="0" max="40" value={dividendTax} onChange={(event) => setDividendTax(Number(event.target.value))} /><b>%</b></div><small>10% final tax on cash dividends from domestic companies.</small></label>
+          <label className="percent-control"><span>Interest tax (final withholding)</span><div><input type="number" min="0" max="60" value={interestTax} onChange={(event) => updatePercent(setInterestTax, event.target.value, 60)} /><b>%</b></div><small>20% final tax on peso bond and deposit interest in a taxable account.</small></label>
+          <label className="percent-control"><span>Dividend tax (final)</span><div><input type="number" min="0" max="40" value={dividendTax} onChange={(event) => updatePercent(setDividendTax, event.target.value, 40)} /><b>%</b></div><small>10% final tax on cash dividends from domestic companies.</small></label>
           <button className="assumptions-toggle" type="button" aria-expanded={assumptionsOpen} onClick={() => setAssumptionsOpen((open) => !open)}><CaretDown size={16} className={assumptionsOpen ? "is-open" : ""} /> Return &amp; yield assumptions</button>
           {assumptionsOpen && (
             <div className="assumptions-panel">
-              <label>Bond / fixed-income yield<div><input type="number" min="0" max="20" step="0.1" value={bondYield} onChange={(event) => setBondYield(Number(event.target.value))} /><b>%</b></div></label>
-              <label>Equity dividend yield<div><input type="number" min="0" max="10" step="0.1" value={equityYield} onChange={(event) => setEquityYield(Number(event.target.value))} /><b>%</b></div></label>
+              <label>Bond / fixed-income yield<div><input type="number" min="0" max="20" step="0.1" value={bondYield} onChange={(event) => updatePercent(setBondYield, event.target.value, 20)} /><b>%</b></div></label>
+              <label>Equity dividend yield<div><input type="number" min="0" max="10" step="0.1" value={equityYield} onChange={(event) => updatePercent(setEquityYield, event.target.value, 10)} /><b>%</b></div></label>
             </div>
           )}
           <div className="controls-actions">
