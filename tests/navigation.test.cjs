@@ -36,6 +36,18 @@ test("native hash navigation, keyboard focus, interactions and responsive layout
         assert.equal(await optimize.evaluate(el => document.activeElement === el), true);
         const outline = await optimize.evaluate(el => getComputedStyle(el).outlineStyle);
         assert.notEqual(outline, "none");
+        // Balance fields have no native border/outline; their enclosing label must
+        // supply a visible focus ring for Tab and screen-magnifier users.
+        const balanceField = page.getByRole("textbox", { name: /Balance for BPI/ });
+        await balanceField.focus();
+        const labelRing = await balanceField.evaluate(el => ({
+          focused: document.activeElement === el,
+          outline: getComputedStyle(el.closest(".money-input")).outlineStyle,
+          width: getComputedStyle(el.closest(".money-input")).outlineWidth,
+        }));
+        assert.equal(labelRing.focused, true);
+        assert.equal(labelRing.outline, "solid", "Balance field label must retain a visible focus ring");
+        assert.equal(labelRing.width, "3px");
         // Two additions at the same clock tick must remain independently editable.
         // Legacy Date.now() IDs could collide and deleting one removed both.
         await page.evaluate(() => { Date.now = () => 1700000000000; });
